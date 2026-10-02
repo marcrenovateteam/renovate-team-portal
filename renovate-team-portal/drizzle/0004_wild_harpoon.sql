@@ -1,0 +1,1 @@
+ALTER TABLE `entries` ADD `reimbursement` integer DEFAULT false NOT NULL;

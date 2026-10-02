@@ -1,0 +1,1 @@
+ALTER TABLE `entries` ADD `company_charge` integer DEFAULT false NOT NULL;

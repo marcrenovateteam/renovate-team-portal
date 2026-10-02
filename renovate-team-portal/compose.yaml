@@ -1,0 +1,14 @@
+services:
+  portal:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      PORTAL_ORIGIN: https://team.renovateteam.com
+      PORTAL_DATA_DIR: /data
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+    volumes:
+      - portal-data:/data
+volumes:
+  portal-data:

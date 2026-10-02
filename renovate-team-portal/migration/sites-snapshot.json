@@ -1,0 +1,89 @@
+{
+  "capturedAt": "2026-10-01T01:50:18.776Z",
+  "projectId": "appgprj_6ab919c0792481919c9ced7d6d464101",
+  "tables": [
+    {
+      "table": "comments",
+      "rows": [],
+      "columns": [
+        "id",
+        "post_id",
+        "owner_id",
+        "author",
+        "body",
+        "created_at"
+      ]
+    },
+    {
+      "table": "entries",
+      "rows": [],
+      "columns": [
+        "id",
+        "owner_id",
+        "kind",
+        "date",
+        "project",
+        "hours",
+        "amount",
+        "end_date",
+        "note",
+        "status",
+        "file_key",
+        "file_name",
+        "created_at",
+        "task_type",
+        "billing_type",
+        "pto_mode",
+        "start_time",
+        "end_time",
+        "reimbursement",
+        "merchant",
+        "company_charge",
+        "denial_reason"
+      ]
+    },
+    {
+      "table": "members",
+      "rows": [
+        {
+          "id": "pKWGhX1f2aspMgrcFlmcZaIDD0G1L2iQTO543kHqbXEgZvA571ArQJ",
+          "email": "marc@renovateteam.com",
+          "name": "Marc Wells",
+          "role": "admin",
+          "created_at": 1790517410477
+        }
+      ],
+      "columns": [
+        "id",
+        "email",
+        "name",
+        "role",
+        "created_at"
+      ]
+    },
+    {
+      "table": "posts",
+      "rows": [],
+      "columns": [
+        "id",
+        "owner_id",
+        "author",
+        "body",
+        "created_at",
+        "image_key",
+        "shared_post_id"
+      ]
+    },
+    {
+      "table": "reactions",
+      "rows": [],
+      "columns": [
+        "id",
+        "post_id",
+        "owner_id",
+        "emoji",
+        "created_at"
+      ]
+    }
+  ]
+}

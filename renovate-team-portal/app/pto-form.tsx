@@ -1,0 +1,11 @@
+'use client';
+import { useActionState, useState } from 'react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { submitPtoRequest } from './actions';
+export default function PtoForm(){
+ const [mode,setMode]=useState('full-day'),[date,setDate]=useState(''),[lastDay,setLastDay]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState('');
+ const [state,action,pending]=useActionState(submitPtoRequest,{error:'',success:false});
+ const minutes=(value:string)=>{const [h,m]=value.split(':').map(Number);return h*60+m};
+ const duration=start&&end?(minutes(end)-minutes(start))/60:0;
+ return <form action={action} className="formCard"><fieldset className="ptoChoice"><legend>How much time do you need?</legend><RadioGroup name="ptoMode" value={mode} onValueChange={setMode} className="ptoOptions"><label><RadioGroupItem value="full-day"/> Full day(s)</label><label><RadioGroupItem value="hourly"/> Part of a day</label></RadioGroup></fieldset><div className="formGrid"><label>{mode==='hourly'?'Day off':'First day'}<input required type="date" name="date" value={date} onChange={e=>setDate(e.target.value)}/></label>{mode==='full-day'?<label>Last day<input required type="date" name="endDate" min={date||undefined} value={lastDay} onChange={e=>setLastDay(e.target.value)}/></label>:<><div className="ptoDuration"><span>Requested time</span><strong>{duration>0?`${duration.toFixed(2)} hours`:'Choose your times'}</strong></div><label>From<input required type="time" name="startTime" value={start} onChange={e=>setStart(e.target.value)}/></label><label>To<input required type="time" name="endTime" value={end} onChange={e=>setEnd(e.target.value)}/></label></>}<label className="wide">Note (optional)<textarea name="note" rows={3} maxLength={2000} placeholder="Anything the team should know about scheduling?"/></label></div>{mode==='hourly'&&start&&end&&duration<=0&&<p className="timeWarning">Choose an end time after the start time.</p>}{state.error&&<p role="alert" className="timeWarning">{state.error}</p>}{state.success&&<p role="status" className="editSuccess">Your time off request was submitted.</p>}<button className="primary" disabled={pending||mode==='hourly'&&!!start&&!!end&&duration<=0}>{pending?'Submitting…':'Submit request'}</button></form>
+}

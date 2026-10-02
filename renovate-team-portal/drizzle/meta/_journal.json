@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790515889090,
+      "tag": "0000_reflective_purple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790593730423,
+      "tag": "0001_mean_mandrill",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790594500112,
+      "tag": "0002_funny_absorbing_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790758261132,
+      "tag": "0003_round_nightshade",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1790758611132,
+      "tag": "0004_wild_harpoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1790758905388,
+      "tag": "0005_married_peter_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1790759341210,
+      "tag": "0006_grey_morlocks",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1790764289390,
+      "tag": "0007_long_nova",
+      "breakpoints": true
+    }
+  ]
+}
