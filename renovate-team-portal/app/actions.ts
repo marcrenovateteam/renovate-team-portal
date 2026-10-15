@@ -57,8 +57,8 @@ export async function submitTimesheet(form:FormData){
   return {id:crypto.randomUUID(),ownerId:m.id,kind:'time',date,project,taskType,billingType,hours,status:'submitted',createdAt:Date.now()};
  });
  const total=valid.reduce((sum,row)=>sum+row.hours,0);
- const db=getDb();const previous=await db.select({hours:entries.hours}).from(entries).where(and(eq(entries.ownerId,m.id),eq(entries.kind,'time'),eq(entries.date,date)));
- if(total+previous.reduce((sum,row)=>sum+(row.hours||0),0)>24)throw new Error('Daily total cannot exceed 24 hours');
+ const db=getDb();const previous=await db.select({hours:entries.hours,status:entries.status}).from(entries).where(and(eq(entries.ownerId,m.id),eq(entries.kind,'time'),eq(entries.date,date))); 
+ if(total+previous.filter(row=>row.status!=='deleted').reduce((sum,row)=>sum+(row.hours||0),0)>24)throw new Error('Daily total cannot exceed 24 hours');
  await db.insert(entries).values(valid);
  await notifyAdmin('Timesheet submitted',`${m.name} submitted ${valid.length} time entries for ${date}, totaling ${total.toFixed(2)} hours. Review them in the team member portal.`);
  revalidatePath('/');
@@ -126,12 +126,12 @@ export async function updateTimeEntry(previous:{error:string;success:boolean},fo
  try {
   const m=ready(await currentMember()),db=getDb();const id=clean(form.get('id'),100);
   const record=await db.select().from(entries).where(and(eq(entries.id,id),eq(entries.ownerId,m.id),eq(entries.kind,'time'))).get();
-  if(!record)return {error:'This time entry is unavailable.',success:false};
+  if(!record||record.status!=='submitted')return {error:'This time entry is locked or unavailable. Ask an administrator to reopen it.',success:false};
   const date=clean(form.get('date'),20),project=clean(form.get('project'),150),taskType=clean(form.get('taskType'),150),billingType=billingForTask(taskType),hours=Number(form.get('hours'));
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||new Date(`${date}T12:00:00Z`).toISOString().slice(0,10)!==date||!project||!JOB_TASK_TYPES.some(task=>task===taskType)||!Number.isFinite(hours)||hours<=0||hours>24)return {error:'Complete all fields with a valid date and hours.',success:false};
-  const day=await db.select({id:entries.id,hours:entries.hours}).from(entries).where(and(eq(entries.ownerId,m.id),eq(entries.kind,'time'),eq(entries.date,date)));
-  if(day.filter(row=>row.id!==id).reduce((sum,row)=>sum+(row.hours||0),0)+hours>24)return {error:'The daily total cannot exceed 24 hours.',success:false};
-  await db.update(entries).set({date,project,taskType,billingType,hours,status:'submitted'}).where(and(eq(entries.id,id),eq(entries.ownerId,m.id),eq(entries.kind,'time')));
+  const day=await db.select({id:entries.id,hours:entries.hours,status:entries.status}).from(entries).where(and(eq(entries.ownerId,m.id),eq(entries.kind,'time'),eq(entries.date,date)));
+  if(day.filter(row=>row.id!==id&&row.status!=='deleted').reduce((sum,row)=>sum+(row.hours||0),0)+hours>24)return {error:'The daily total cannot exceed 24 hours.',success:false};
+  await db.update(entries).set({date,project,taskType,billingType,hours,status:'submitted'}).where(and(eq(entries.id,id),eq(entries.ownerId,m.id),eq(entries.kind,'time'),eq(entries.status,'submitted')));
   await notifyAdmin('Timesheet correction submitted',`${m.name} corrected a time entry for ${date}. Review the updated record in the team member portal.`);
   revalidatePath('/');return {error:'',success:true};
  }catch(error){console.error('Time correction failed',error);return {error:'Unable to save the correction. Please try again.',success:false}}
@@ -140,8 +140,8 @@ export async function deleteTimeEntry(previous:{error:string},form:FormData):Pro
  try {
   const m=ready(await currentMember()),db=getDb();const id=clean(form.get('id'),100);
   const record=await db.select().from(entries).where(and(eq(entries.id,id),eq(entries.ownerId,m.id),eq(entries.kind,'time'))).get();
-  if(!record)return {error:'This time entry is unavailable.'};
-  await db.delete(entries).where(and(eq(entries.id,id),eq(entries.ownerId,m.id),eq(entries.kind,'time')));
+  if(!record||record.status!=='submitted')return {error:'This time entry is locked or unavailable.'};
+  await db.update(entries).set({status:'deleted'}).where(and(eq(entries.id,id),eq(entries.ownerId,m.id),eq(entries.kind,'time'),eq(entries.status,'submitted')));
   await notifyAdmin('Timesheet entry deleted',`${m.name} deleted their ${record.hours} hour entry for ${record.date} (${record.project||'Work'}). Review the updated daily total in the team member portal.`);
   revalidatePath('/');return {error:''};
  }catch(error){console.error('Time deletion failed',error);return {error:'Unable to delete this entry. Please try again.'}}
